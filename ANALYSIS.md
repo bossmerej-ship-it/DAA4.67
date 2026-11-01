@@ -153,9 +153,13 @@ Actual batch results are below. Times include process startup and JSON transport
 
 The public setup passed. All 44 public cases passed, followed by 88 requests in the public repeated mixed batch; see [setup.txt](tests/student/setup.txt) and [public-checks.txt](tests/student/public-checks.txt). Student tests passed 1,774 cases. The 30 scale cases use published maximum lengths and check correctness as well as completion. Each student task's scale batch uses the same 20-second process timeout as the public launcher.
 
-Scale checks include 1000-by-1000 LCS, 200-block merging (equal, zero and sparse sizes), three 100,000-vertex trees, naive patterns up to 3000, KMP text/pattern lengths 200000/100000, RK text/pattern maxima and a 20,000,000 text-pattern product, 50,000-character equal and periodic suffix inputs, and all Aho aggregate limits. Aho checks include 10,000 duplicate patterns with total length 100,000 and a 100-by-10,000 count matrix. Each output batch remains below 8 MiB.
+Scale checks include 1000-by-1000 LCS, 200-block merging (equal, zero and sparse sizes), three 100,000-vertex trees, naive patterns up to 3000, KMP text/pattern lengths 200000/100000, RK text/pattern maxima and a 20,000,000 text-pattern product, 50,000-character equal, periodic and random printable-ASCII suffix inputs, and all Aho aggregate limits. Aho checks include 10,000 duplicate patterns with total length 100,000 and a 100-by-10,000 count matrix. The additional branching dictionary has 10,000 distinct length-10 patterns and two 98,999-character texts, followed by an empty text. Each output batch remains below 8 MiB.
 
 For 200 equal merge weights, an independent closed-form optimum is (200*8 - (256-200))*10^9 = 1,544,000,000,000. A single nonzero block can be joined after merging all zero blocks, for cost 10^9. Known suffix ordering/LCP formulas validate the large repetitive strings without allocating all suffixes. Small exhaustive/random checks separately validate general behaviour.
+
+For the 50,000-character random suffix case (seed 20261106), the independent oracle sorts at most 64 characters per suffix and asserts that all sorted keys are distinct. Distinct prefixes determine the exact suffix order, and shorter keys correctly represent suffixes ending before 64 characters. Direct adjacent comparisons then compute LCP. This checks general large inputs independently of the submitted rank-doubling implementation.
+
+The branching Aho case uses seed 20261107. Its 10,000 distinct patterns contain printable non-space characters and all have length 10. Texts join sampled whole patterns with spaces. Because a pattern cannot cross a separator or fit wholly inside another length-10 token at a different start, independent token frequencies give exact expected counts. Both texts use separate frequency counters and the last empty text checks reset.
 
 The 19 rubric groups are covered: lcs/merge/tree core, witness and scale (9 groups); naive core, kmp core/scale and rk core (4); suffix core/witness/scale (3); aho core/edge/scale (3). These are verification results, not an official awarded mark.
 
@@ -173,37 +177,37 @@ Compilation and JVM startup are excluded. The benchmark runs in one JVM with:
 
 The VM uses synchronous compilation with tiered compilation disabled. Each method receives 10,000 global warm-up iterations across three small cases (30,000 calls per method) and then 100 warm-up calls per scenario. Warm-up durations are excluded. There are three measured rounds; each sample contains 50 full calls, including preprocessing, result-list allocation and filling, and a volatile result assignment preventing unused-result elimination. Algorithm order rotates by round. JSON parsing/serialization, correctness checking, input generation, candidate counting and CSV printing are outside every timing interval. No explicit GC is requested; ordinary allocation/GC and OS scheduling can affect times.
 
-Raw sample durations use System.nanoTime and are **nanoseconds per 50 calls**. The median is the middle raw sample; the final column divides it by 50,000 to give microseconds per call. The complete machine-readable data, including candidate counts and matches, is [benchmark.csv](tests/student/benchmark.csv). Reproduce with python tests/student/benchmark.py; timings vary by machine and JVM.
+Raw sample durations use System.nanoTime and are **nanoseconds per 50 calls**. The median is the middle raw sample; the final column divides it by 50,000 to give microseconds per call. The complete machine-readable data, including candidate counts and matches, is [benchmark.csv](tests/student/benchmark.csv). Reproduce with python tests/student/benchmark.py; timings vary by machine and JVM. The accompanying [benchmark.metadata.json](tests/student/benchmark.metadata.json) records the actual collection time in UTC, runtime versions, JVM flags, warm-up policy and SHA-256 digests of the measured sources and CSV. Digests normalize text to UTF-8 with LF newlines, so Windows checkout newline conversion does not change verification.
 
 | Case | n | m | Seed | Method | Run 1 ns | Run 2 ns | Run 3 ns | Median ns | Median µs/call | Checked |
 |---|---:|---:|---:|---|---:|---:|---:|---:|---:|---|
-| random | 600 | 200 | 20261701 | naive | 63300 | 77400 | 64500 | 64500 | 1.290 | PASS |
-| random | 600 | 200 | 20261701 | kmp | 171900 | 310000 | 172400 | 172400 | 3.448 | PASS |
-| random | 600 | 200 | 20261701 | rk | 445100 | 393200 | 394600 | 394600 | 7.892 | PASS |
-| random | 1800 | 600 | 20262901 | naive | 206200 | 195100 | 192100 | 195100 | 3.902 | PASS |
-| random | 1800 | 600 | 20262901 | kmp | 506400 | 734100 | 680800 | 680800 | 13.616 | PASS |
-| random | 1800 | 600 | 20262901 | rk | 1295800 | 1694600 | 1215800 | 1295800 | 25.916 | PASS |
-| random | 3000 | 1000 | 20264101 | naive | 299500 | 307200 | 296500 | 299500 | 5.990 | PASS |
-| random | 3000 | 1000 | 20264101 | kmp | 837700 | 896000 | 908500 | 896000 | 17.920 | PASS |
-| random | 3000 | 1000 | 20264101 | rk | 2061900 | 2264000 | 1988500 | 2061900 | 41.238 | PASS |
-| repetitive-miss | 600 | 200 | 20261701 | naive | 6202900 | 6344700 | 6264400 | 6264400 | 125.288 | PASS |
-| repetitive-miss | 600 | 200 | 20261701 | kmp | 307900 | 348100 | 323800 | 323800 | 6.476 | PASS |
-| repetitive-miss | 600 | 200 | 20261701 | rk | 336700 | 337000 | 337600 | 337000 | 6.740 | PASS |
-| repetitive-miss | 1800 | 600 | 20262901 | naive | 68283400 | 59594000 | 57550800 | 59594000 | 1191.880 | PASS |
-| repetitive-miss | 1800 | 600 | 20262901 | kmp | 1043600 | 996300 | 927400 | 996300 | 19.926 | PASS |
-| repetitive-miss | 1800 | 600 | 20262901 | rk | 1052200 | 1035600 | 1034200 | 1035600 | 20.712 | PASS |
-| repetitive-miss | 3000 | 1000 | 20264101 | naive | 174034700 | 177489100 | 164114900 | 174034700 | 3480.694 | PASS |
-| repetitive-miss | 3000 | 1000 | 20264101 | kmp | 1929500 | 1771700 | 1567100 | 1771700 | 35.434 | PASS |
-| repetitive-miss | 3000 | 1000 | 20264101 | rk | 1831400 | 1775800 | 1870900 | 1831400 | 36.628 | PASS |
-| repetitive-collision | 600 | 200 | 20261701 | naive | 6427000 | 6374400 | 6268900 | 6374400 | 127.488 | PASS |
-| repetitive-collision | 600 | 200 | 20261701 | kmp | 293500 | 323100 | 311900 | 311900 | 6.238 | PASS |
-| repetitive-collision | 600 | 200 | 20261701 | rk | 21481100 | 21408000 | 21287500 | 21408000 | 428.160 | PASS |
-| repetitive-collision | 1800 | 600 | 20262901 | naive | 55928700 | 72139100 | 68869600 | 68869600 | 1377.392 | PASS |
-| repetitive-collision | 1800 | 600 | 20262901 | kmp | 911900 | 1016600 | 4015200 | 1016600 | 20.332 | PASS |
-| repetitive-collision | 1800 | 600 | 20262901 | rk | 197501800 | 209541600 | 203809100 | 203809100 | 4076.182 | PASS |
-| repetitive-collision | 3000 | 1000 | 20264101 | naive | 165697700 | 167539500 | 167055400 | 167055400 | 3341.108 | PASS |
-| repetitive-collision | 3000 | 1000 | 20264101 | kmp | 1715300 | 1526700 | 1580100 | 1580100 | 31.602 | PASS |
-| repetitive-collision | 3000 | 1000 | 20264101 | rk | 573103600 | 582398600 | 585976700 | 582398600 | 11647.972 | PASS |
+| random | 600 | 200 | 20261701 | naive | 34800 | 35500 | 35600 | 35500 | 0.710 | PASS |
+| random | 600 | 200 | 20261701 | kmp | 94700 | 101000 | 115000 | 101000 | 2.020 | PASS |
+| random | 600 | 200 | 20261701 | rk | 225300 | 215500 | 215800 | 215800 | 4.316 | PASS |
+| random | 1800 | 600 | 20262901 | naive | 111700 | 107500 | 202600 | 111700 | 2.234 | PASS |
+| random | 1800 | 600 | 20262901 | kmp | 285300 | 428200 | 541300 | 428200 | 8.564 | PASS |
+| random | 1800 | 600 | 20262901 | rk | 661300 | 1378900 | 658600 | 661300 | 13.226 | PASS |
+| random | 3000 | 1000 | 20264101 | naive | 166500 | 182000 | 165600 | 166500 | 3.330 | PASS |
+| random | 3000 | 1000 | 20264101 | kmp | 474300 | 507000 | 505800 | 505800 | 10.116 | PASS |
+| random | 3000 | 1000 | 20264101 | rk | 1082000 | 1221800 | 1082300 | 1082300 | 21.646 | PASS |
+| repetitive-miss | 600 | 200 | 20261701 | naive | 3648800 | 3623300 | 3432000 | 3623300 | 72.466 | PASS |
+| repetitive-miss | 600 | 200 | 20261701 | kmp | 178700 | 172700 | 181500 | 178700 | 3.574 | PASS |
+| repetitive-miss | 600 | 200 | 20261701 | rk | 195200 | 189900 | 189700 | 189900 | 3.798 | PASS |
+| repetitive-miss | 1800 | 600 | 20262901 | naive | 30773900 | 31388800 | 30456700 | 30773900 | 615.478 | PASS |
+| repetitive-miss | 1800 | 600 | 20262901 | kmp | 534000 | 526900 | 521300 | 526900 | 10.538 | PASS |
+| repetitive-miss | 1800 | 600 | 20262901 | rk | 570800 | 566100 | 566000 | 566100 | 11.322 | PASS |
+| repetitive-miss | 3000 | 1000 | 20264101 | naive | 84024100 | 84657300 | 86237500 | 84657300 | 1693.146 | PASS |
+| repetitive-miss | 3000 | 1000 | 20264101 | kmp | 861100 | 853400 | 858200 | 858200 | 17.164 | PASS |
+| repetitive-miss | 3000 | 1000 | 20264101 | rk | 970800 | 960900 | 950100 | 960900 | 19.218 | PASS |
+| repetitive-collision | 600 | 200 | 20261701 | naive | 3435400 | 3497300 | 3402300 | 3435400 | 68.708 | PASS |
+| repetitive-collision | 600 | 200 | 20261701 | kmp | 165900 | 171400 | 176400 | 171400 | 3.428 | PASS |
+| repetitive-collision | 600 | 200 | 20261701 | rk | 11680100 | 11702600 | 11652100 | 11680100 | 233.602 | PASS |
+| repetitive-collision | 1800 | 600 | 20262901 | naive | 74259400 | 70576100 | 68362200 | 70576100 | 1411.522 | PASS |
+| repetitive-collision | 1800 | 600 | 20262901 | kmp | 1374800 | 1152100 | 3130100 | 1374800 | 27.496 | PASS |
+| repetitive-collision | 1800 | 600 | 20262901 | rk | 234458900 | 220805000 | 228390300 | 228390300 | 4567.806 | PASS |
+| repetitive-collision | 3000 | 1000 | 20264101 | naive | 207348800 | 196646700 | 235592800 | 207348800 | 4146.976 | PASS |
+| repetitive-collision | 3000 | 1000 | 20264101 | kmp | 1608500 | 1622900 | 2319500 | 1622900 | 32.458 | PASS |
+| repetitive-collision | 3000 | 1000 | 20264101 | rk | 649603000 | 639502200 | 690561100 | 649603000 | 12992.060 | PASS |
 
 Random inputs usually reject windows at their first mismatching character, so naive search can have a low constant cost. Samples vary between rounds despite identical inputs. Warm-up and synchronous compilation reduce startup effects, but scheduling, allocation and cache effects remain. These short measurements must not be used to infer an asymptotic growth law.
 

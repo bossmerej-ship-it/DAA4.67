@@ -37,7 +37,7 @@ The launcher creates Java/build automatically. Before the direct build, create t
 
 The public suite passes all 44 cases and the repeated 88-request mixed batch. The student suite passes 1,774 checks: boundary fixtures, independent randomized oracles, repeated mixed requests and full-domain stress. Tests accept alternative optimal witnesses and validate reconstruction. The GitHub Actions workflow also runs the student suite.
 
-[ANALYSIS.md](ANALYSIS.md) contains correctness arguments, reconstruction, time and memory bounds, actual test results, and the search comparison. Raw benchmark samples are in [benchmark.csv](tests/student/benchmark.csv); fixed request/expected/actual records are in [results.json](tests/student/results.json). See [student test instructions](tests/student/README.md) for generators and timing details.
+[ANALYSIS.md](ANALYSIS.md) contains correctness arguments, reconstruction, time and memory bounds, actual test results, and the search comparison. Raw benchmark samples are in [benchmark.csv](tests/student/benchmark.csv), with runtime information and file digests in [benchmark.metadata.json](tests/student/benchmark.metadata.json); fixed request/expected/actual records are in [results.json](tests/student/results.json). See [student test instructions](tests/student/README.md) for generators and timing details.
 
 Only Java is the selected solution; the other language directories retain the template starters.
 
