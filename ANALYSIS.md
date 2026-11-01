@@ -1,5 +1,31 @@
 # Assignment 4 — Analysis
 
+- **Student:** Merey Kuatbay
+- **Group:** SE 2537
+- **GitHub:** [bossmerej-ship-it](https://github.com/bossmerej-ship-it)
+- **Course:** Design and Analysis of Algorithms
+- **Assignment:** 4 — Dynamic Programming and String Processing
+- **Language:** Java 17 (see [submission.json](submission.json))
+
+## Complexity summary
+
+These bounds describe the algorithms after JSON parsing. Input storage is excluded; auxiliary and returned output storage are listed separately.
+
+| Command | Time | Auxiliary space | Output space |
+|---|---|---|---|
+| lcs | O((n+1)(m+1)) | O((n+1)(m+1)) | O(ell+1) |
+| merge | O(n³+1) | O(n²+1) | O(n+1) |
+| tree | O(n+1) | O(n+1) | O(n+1) |
+| naive | O(nm+n+1) | O(1) | O(z+1) |
+| kmp | O(n+m+z+1) | O(m+1) | O(z+1) |
+| rk | O(n+m+cm) for 1 ≤ m ≤ n | O(1) | O(z+1) |
+| suffix | O(n log(n+1)+1) | O(n+1) | O(n+1) |
+| aho | O(L+95S+p+T+q(S+p+1)+1) | O(95S+p) | O(q(p+1)+1) |
+
+For LCS, n and m are the input lengths and ell is the returned subsequence length. For search, n and m are text and pattern lengths, z is the number of matches, and c is the number of equal-hash candidate windows. For merge/tree/suffix, n is the number of blocks/vertices/characters. For Aho–Corasick, L is total pattern length, S is the number of trie states including the root, p is the number of patterns, q is the number of texts and T is their total length; 95 is the fixed printable-ASCII alphabet size.
+
+RK handles an empty pattern in O(n+1) and an oversized pattern in O(1) after parsing. Its universal time bound is O(nm+n+m+1); equal-hash verification can make it quadratic. The suffix bound uses counting-sort prefix doubling followed by linear-time Kasai LCP.
+
 ## Environment and actual commands
 
 The selected implementation is Java 17, configured in submission.json. Local verification and measurements were performed on 1 November 2026 using Oracle JDK / HotSpot 17.0.12, javac 17.0.12, Python 3.12.10, Windows 11 Pro x64 (10.0.26200), an AMD Ryzen 7 7435HS (8 cores, 16 logical processors), and 16,849,264,640 bytes of physical RAM (approximately 15.69 GiB). The program is single-threaded. The launcher limits the Java heap to 384 MiB. No measured peak-memory claim is made.

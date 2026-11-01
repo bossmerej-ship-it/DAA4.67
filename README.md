@@ -1,6 +1,11 @@
 # Assignment 4 — Dynamic Programming and String Processing
 
-Selected language: **Java 17** (see [submission.json](submission.json)).
+- **Student:** Merey Kuatbay
+- **Group:** SE 2537
+- **GitHub:** [bossmerej-ship-it](https://github.com/bossmerej-ship-it)
+- **Course:** Design and Analysis of Algorithms
+- **Assignment:** 4 — Dynamic Programming and String Processing
+- **Language:** Java 17 (see [submission.json](submission.json))
 
 The implementation provides all eight commands through the supplied UTF-8 JSON Lines interface. Each input line produces one JSON result line; requests can be mixed in the same process.
 
@@ -29,6 +34,41 @@ To build and launch Java directly:
     java -Xmx384m -cp Java/build Main
 
 The launcher creates Java/build automatically. Before the direct build, create that directory if it does not exist.
+
+## JSON Lines example
+
+Input:
+
+```json
+{"task":"lcs","a":"tea_time","b":"team"}
+```
+
+Output:
+
+```json
+{"length":4,"sequence":"team"}
+```
+
+This request is also saved in [examples/lcs.jsonl](examples/lcs.jsonl). Each request and result occupies one line; the program supports consecutive requests in the same process.
+
+## Complexity summary
+
+These bounds describe the algorithms after JSON parsing. Input storage is excluded; auxiliary and returned output storage are listed separately.
+
+| Command | Time | Auxiliary space | Output space |
+|---|---|---|---|
+| lcs | O((n+1)(m+1)) | O((n+1)(m+1)) | O(ell+1) |
+| merge | O(n³+1) | O(n²+1) | O(n+1) |
+| tree | O(n+1) | O(n+1) | O(n+1) |
+| naive | O(nm+n+1) | O(1) | O(z+1) |
+| kmp | O(n+m+z+1) | O(m+1) | O(z+1) |
+| rk | O(n+m+cm) for 1 ≤ m ≤ n | O(1) | O(z+1) |
+| suffix | O(n log(n+1)+1) | O(n+1) | O(n+1) |
+| aho | O(L+95S+p+T+q(S+p+1)+1) | O(95S+p) | O(q(p+1)+1) |
+
+For LCS, n and m are the input lengths and ell is the returned subsequence length. For search, n and m are text and pattern lengths, z is the number of matches, and c is the number of equal-hash candidate windows. For merge/tree/suffix, n is the number of blocks/vertices/characters. For Aho–Corasick, L is total pattern length, S is the number of trie states including the root, p is the number of patterns, q is the number of texts and T is their total length; 95 is the fixed printable-ASCII alphabet size.
+
+RK handles an empty pattern in O(n+1) and an oversized pattern in O(1) after parsing. Its universal time bound is O(nm+n+m+1); equal-hash verification can make it quadratic. The suffix bound uses counting-sort prefix doubling followed by linear-time Kasai LCP.
 
 ## Verification and comparison
 
