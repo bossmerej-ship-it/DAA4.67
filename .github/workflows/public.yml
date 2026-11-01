@@ -24,3 +24,6 @@ jobs:
       - name: Algorithm examples in student repositories
         if: github.repository != 'RZhaniya/daa-assignment-4-archive'
         run: python -c "import json,subprocess; lang=json.load(open('submission.json'))['language']; assert lang in ['Java','Python','Cpp','CSharp']; subprocess.run(['python','tools/run.py','--language',lang,'--check'],check=True)"
+      - name: Independent student tests and full-domain stress
+        if: github.repository != 'RZhaniya/daa-assignment-4-archive'
+        run: python tests/student/run_tests.py "${{ runner.temp }}/student-results.json"

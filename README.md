@@ -1,51 +1,48 @@
 # Assignment 4 — Dynamic Programming and String Processing
 
-[Interactive lesson and practice](https://rzhaniya.github.io/daa-assignment-4-archive/) · [English specification](docs/Assignment_4_EN.md) · [Русская версия](docs/README_RU.md)
+Selected language: **Java 17** (see [submission.json](submission.json)).
 
-**Course:** Design and Analysis of Algorithms. **Practical:** 50 points. **Defence:** 50 points. **Availability:** 29 October–8 November 2026, 23:59, for both practical work and defence; Moodle records approved extensions.
+The implementation provides all eight commands through the supplied UTF-8 JSON Lines interface. Each input line produces one JSON result line; requests can be mixed in the same process.
 
-Implement six parts with eight commands: LCS; ordered adjacent-block merging; maximum-weight independent set on a tree; naive, KMP and exact Rabin–Karp search; suffix array with Kasai LCP; Aho–Corasick. The work covers syllabus weeks 8–10. This is a starter template: the algorithm methods are TODOs. Read the specification before coding.
+| Command | Implementation |
+|---|---|
+| lcs | Prefix DP and reconstruction of an optimal subsequence |
+| merge | Interval DP, 64-bit costs and a chronological adjacent-merge plan |
+| tree | Iterative take/skip DP and independent-set reconstruction |
+| naive | Direct character comparisons, including overlapping matches |
+| kmp | Prefix function, mismatch fallback and overlapping matches |
+| rk | Base 31, modulus 101, normalized rolling hash and character verification |
+| suffix | Prefix doubling with stable counting sorts, Kasai LCP and a longest repeat |
+| aho | Trie, BFS failure links and reverse-failure count aggregation |
 
-## Create your repository
+## Build and run
 
-1. Select **Use this template → Create a new repository**. Create your own repository, then clone it to your computer or open it in your development environment. Work in your copy.
-2. Set `language` in `submission.json` to `Java`, `Python`, `Cpp` or `CSharp`. Install Python 3.12+ for the launcher and the selected runtime: JDK 17+, Python 3.12+, C++17 compiler, or .NET 8 SDK.
-3. From the repository root, run `python tools/run.py --setup`. This checks compilation and startup, not the algorithms.
-4. Implement the TODO methods in your chosen language's `source` directory. Preserve the UTF-8 JSON Lines interface. Add your own tests under `tests/student` and complete [ANALYSIS.md](ANALYSIS.md) in English.
-5. Run `python tools/run.py --check`. It checks 44 public cases and a repeated mixed batch. Also test the full published domains, boundary cases and alternative optimal witnesses.
-6. Commit and push your implementation. In **Actions → Public checks**, check the run for that commit. The official template checks startup in all four languages; your copy also runs the algorithm checks.
+Install JDK 17+ and Python 3.12+. Run from the repository root:
 
-## Submit in Moodle
+    python tools/run.py --setup
+    python tools/run.py --check
+    python tools/run.py --input examples/lcs.jsonl
 
-Submit the **exact commit URL with its full 40-character SHA**, plus the chosen language, in [Assignment 4 → Online text](https://lms.astanait.edu.kz/mod/assign/view.php?id=95272). An Actions run URL for the same commit is optional. Give the teacher access if your repository is private. Click **Submit assignment** and verify the final submission status. If you revise before the deadline, update the commit link. Do not upload a ZIP as your submission.
+To build and launch Java directly:
 
-The submitted commit must include selected source files, `submission.json`, your tests, completed English `ANALYSIS.md` and actual build/run/test commands. Include correctness, reconstruction, complexity and a reproducible comparison of naive/KMP/exact RK. Acknowledge sources and AI assistance, their contribution and your own verification.
+    javac --release 17 -encoding UTF-8 -d Java/build Java/source/Json.java Java/source/Algorithms.java Java/source/Main.java
+    java -Xmx384m -cp Java/build Main
 
-## Learn and prepare
+The launcher creates Java/build automatically. Before the direct build, create that directory if it does not exist.
 
-Use the [bilingual lesson](https://rzhaniya.github.io/daa-assignment-4-archive/), eight small interactive models, [Week 8 lecture](https://rzhaniya.github.io/daa-assignment-4-archive/week8/), and the [ungraded 15-question / 25-minute practice](https://rzhaniya.github.io/daa-assignment-4-archive/practice.html). The public learning questions are separate from the assessed Moodle questions.
+## Verification and comparison
 
-The [individual English defence](https://lms.astanait.edu.kz/mod/quiz/view.php?id=95271) has **15 questions in 25 minutes**, one attempt: 10 single-answer and 5 multiple-response, three pages of five, free navigation. All six assignment parts are covered. Work independently without AI or external assistance during the defence.
+    python tests/student/run_tests.py
+    python tests/student/benchmark.py
 
-Each question is worth 1 raw point; quiz grade = raw/15 × 50. A single-answer question earns 1 for a correct answer and 0 for a wrong or blank answer. For a multiple-response question with k correct options (2 or 3), each selected correct option earns 1/k and each selected wrong option deducts 1/(2k), with a floor of zero per question. Selecting all five earns 0.25 for k=2 or about 0.67 for k=3. Full credit requires every correct option and no wrong selections. Follow the quiz instructions and approved accommodations in Moodle.
+The public suite passes all 44 cases and the repeated 88-request mixed batch. The student suite passes 1,772 checks: boundary fixtures, independent randomized oracles, repeated mixed requests and full-domain stress. Tests accept alternative optimal witnesses and validate reconstruction. The GitHub Actions workflow also runs the student suite.
 
-## Assessment and contracts
+[ANALYSIS.md](ANALYSIS.md) contains correctness arguments, reconstruction, time and memory bounds, actual test results, and the search comparison. Raw benchmark samples are in [benchmark.csv](tests/student/benchmark.csv); fixed request/expected/actual records are in [results.json](tests/student/results.json). See [student test instructions](tests/student/README.md) for generators and timing details.
 
-Practical work: 19 marking groups, 50 points. Defence: 50 points. A4 is out of 100 and contributes 20% of the second attestation; Quiz II is separate. The practical mark is calculated from the submitted commit using the rubric. Alternative optimal witnesses are accepted wherever reconstruction is non-unique. The rubric defines the 19 marking groups, required output schemas and partial credit.
+Only Java is the selected solution; the other language directories retain the template starters.
 
-| Practical part | Points |
-|---|---:|
-| LCS | 8 |
-| Ordered adjacent-block merging | 7 |
-| Tree independent set | 7 |
-| Naive / KMP / exact RK | 10 |
-| Suffix array and Kasai LCP | 9 |
-| Aho–Corasick | 9 |
-| **Total** | **50** |
+## Assignment references and submission
 
-<details>
-<summary>Detailed reference</summary>
+[Official template](https://github.com/RZhaniya/daa-assignment-4-archive) · [English specification](docs/Assignment_4_EN.md) · [Contracts](docs/guide/CONTRACTS.md) · [Rubric](docs/guide/RUBRIC.md) · [Interactive lesson and practice](https://rzhaniya.github.io/daa-assignment-4-archive/)
 
-[Contracts](docs/guide/CONTRACTS.md) · [Rubric](docs/guide/RUBRIC.md) · [Testing](docs/guide/TESTING.md) · [Submission checklist](docs/guide/SUBMISSION.md) · [Algorithm notes](docs/LECTURE_CLARIFICATIONS_EN_RU.md)
-
-</details>
+For Moodle Online text, provide the exact GitHub commit URL with its full 40-character SHA and the chosen language, **Java**. The Actions run URL for the same commit is optional. Click **Submit assignment** and check the final submission status. The practical repository work and the individual defence are separate components.
