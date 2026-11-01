@@ -6,6 +6,7 @@ import platform
 import random
 import sys
 import time
+from collections import Counter
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "tools"))
@@ -52,6 +53,10 @@ def tree_oracle(weights, edges):
 def suffix_oracle(text):
     # Materializing short suffixes is deliberately confined to the test oracle.
     sa = sorted(range(len(text)), key=lambda i: text[i:])
+    return suffix_result(text, sa)
+
+
+def suffix_result(text, sa):
     lcp = [0] * len(text)
     repeated = ""
     for k in range(1, len(text)):
@@ -62,6 +67,34 @@ def suffix_oracle(text):
         if common > len(repeated):
             repeated = text[i:i + common]
     return {"sa": sa, "lcp": lcp, "repeated": repeated}
+
+
+def random_suffix_scale():
+    rng = random.Random(SEED + 5)
+    text = "".join(chr(rng.randrange(32, 127)) for _ in range(50000))
+    # Distinct 64-character prefixes determine the exact full suffix order.
+    # The assertion makes this a checked property, rather than an assumption.
+    prefixes = [text[i:i + 64] for i in range(len(text))]
+    sa = sorted(range(len(text)), key=prefixes.__getitem__)
+    assert all(prefixes[a] < prefixes[b] for a, b in zip(sa, sa[1:]))
+    return {"task": "suffix", "text": text}, suffix_result(text, sa)
+
+
+def branching_aho_scale():
+    rng = random.Random(SEED + 6)
+    patterns = ["".join(chr(rng.randrange(33, 127)) for _ in range(10)) for _ in range(10000)]
+    assert len(set(patterns)) == len(patterns)
+    texts, counts = [], []
+    for _ in range(2):
+        indices = [rng.randrange(len(patterns)) for _ in range(9000)]
+        frequency = Counter(indices)
+        texts.append(" ".join(patterns[i] for i in indices))
+        # Patterns have equal length and never contain the separator, so no
+        # occurrence can span tokens or start inside a different whole token.
+        counts.append([frequency[i] for i in range(len(patterns))])
+    texts.append("")
+    counts.append([0] * len(patterns))
+    return {"task": "aho", "patterns": patterns, "texts": texts}, {"counts": counts}
 
 
 def aho_oracle(patterns, texts):
@@ -198,6 +231,8 @@ def scale_cases():
         {"sa": list(range(n - 2, -1, -2)) + list(range(n - 1, -1, -2)),
          "lcp": [0] + list(range(2, n - 1, 2)) + [0] + list(range(1, n - 2, 2)),
          "repeated": "ab" * (n // 2 - 1)})
+    request, expected = random_suffix_scale()
+    add("suffix-50000-random-ascii", request, expected)
     # Maximum trie depth and total pattern/text length; no recursive traversal.
     add("aho-100000-depth", {"task": "aho", "patterns": ["a" * 100000], "texts": ["a" * 200000]},
         {"counts": [[100001]]})
@@ -210,6 +245,8 @@ def scale_cases():
         {"counts": [[2000] * 10000 for _ in range(100)]})
     add("aho-max-empty-rows", {"task": "aho", "patterns": [], "texts": [""] * 100},
         {"counts": [[] for _ in range(100)]})
+    request, expected = branching_aho_scale()
+    add("aho-10000-branching", request, expected)
     return cases
 
 

@@ -139,19 +139,19 @@ Actual batch results are below. Times include process startup and JSON transport
 
 | Batch | Cases | Actual seconds | Result |
 |---|---:|---:|---|
-| boundary fixtures | 71 | 0.254 | PASS |
-| independent randomized oracles | 1460 | 0.376 | PASS |
-| repeated mixed requests | 213 | 0.274 | PASS |
-| scale lcs | 3 | 0.366 | PASS |
-| scale merge | 3 | 0.294 | PASS |
-| scale tree | 3 | 0.958 | PASS |
-| scale naive | 4 | 0.268 | PASS |
-| scale kmp | 4 | 0.538 | PASS |
-| scale rk | 4 | 0.407 | PASS |
-| scale suffix | 2 | 0.450 | PASS |
-| scale aho | 5 | 0.842 | PASS |
+| boundary fixtures | 71 | 0.171 | PASS |
+| independent randomized oracles | 1460 | 0.293 | PASS |
+| repeated mixed requests | 213 | 0.164 | PASS |
+| scale lcs | 3 | 0.254 | PASS |
+| scale merge | 3 | 0.290 | PASS |
+| scale tree | 3 | 0.694 | PASS |
+| scale naive | 4 | 0.197 | PASS |
+| scale kmp | 4 | 0.356 | PASS |
+| scale rk | 4 | 0.296 | PASS |
+| scale suffix | 3 | 0.342 | PASS |
+| scale aho | 6 | 0.563 | PASS |
 
-The public setup passed. All 44 public cases passed, followed by 88 requests in the public repeated mixed batch; see [setup.txt](tests/student/setup.txt) and [public-checks.txt](tests/student/public-checks.txt). Student tests passed 1,772 cases. The 28 scale cases use published maximum lengths and check correctness as well as completion. Each student task's scale batch uses the same 20-second process timeout as the public launcher.
+The public setup passed. All 44 public cases passed, followed by 88 requests in the public repeated mixed batch; see [setup.txt](tests/student/setup.txt) and [public-checks.txt](tests/student/public-checks.txt). Student tests passed 1,774 cases. The 30 scale cases use published maximum lengths and check correctness as well as completion. Each student task's scale batch uses the same 20-second process timeout as the public launcher.
 
 Scale checks include 1000-by-1000 LCS, 200-block merging (equal, zero and sparse sizes), three 100,000-vertex trees, naive patterns up to 3000, KMP text/pattern lengths 200000/100000, RK text/pattern maxima and a 20,000,000 text-pattern product, 50,000-character equal and periodic suffix inputs, and all Aho aggregate limits. Aho checks include 10,000 duplicate patterns with total length 100,000 and a 100-by-10,000 count matrix. Each output batch remains below 8 MiB.
 

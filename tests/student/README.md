@@ -5,7 +5,7 @@ Run from the repository root with Python 3.12+ and JDK 17+:
     python tests/student/run_tests.py
     python tests/student/benchmark.py
 
-run_tests.py compiles the selected Java implementation. It checks 71 fixed fixtures, 1,460 independently generated small cases, 213 repeated mixed requests, and 28 full-domain scale cases: **1,772 total**. Seed: 20261101. Each subprocess has a 20-second timeout.
+run_tests.py compiles the selected Java implementation. It checks 71 fixed fixtures, 1,460 independently generated small cases, 213 repeated mixed requests, and 30 full-domain scale cases: **1,774 total**. Seed: 20261101. Each subprocess has a 20-second timeout.
 
 Small expected answers use exhaustive subsequences, actual adjacent merge choices, independent vertex subsets, direct built-in matching in the oracle only, and short suffix-string sorting. The supplied public validator checks output schemas and witnesses, accepting alternative optima. Large cases check known optima, plans, selected vertices, exact search positions, suffix arrays/LCP and count matrices. All printable ASCII characters and JSON quoting/backslashes are covered.
 
